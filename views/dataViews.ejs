@@ -88,7 +88,51 @@
           border-radius: 4px;
           cursor: not-allowed;
         }
+/* Loading Overlay (Initially Hidden) */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex; /* Keep it flex so centering works */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    z-index: 9999;
+    visibility: hidden; /* Use visibility instead of display */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
 
+/* Loading Spinner */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Animation for Spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* Success Message (Initially Hidden) */
+#success-message {
+    display: none; /* Hidden by default */
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    text-align: center;
+    margin-top: 20px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+}
 
   </style>
    
@@ -358,47 +402,47 @@
                             <button type="button" data-id="<%= response.id %>" class="btn btn-primary btn-update">Update</button>
                         </form>
                                           
-                       
-                        <!-- Email Section -->
-                        <div class="email-section">
-              
-                          <h4>Send an Email.</h4>
-                      <form id="emailForm" enctype="multipart/form-data">
-                          <div class="mb-3">
-                              <label for="fromEmail" class="form-label">From:</label>
-                              <input type="email" name="ffremail" class="form-control" id="fromEmail" value="bhutobhawisyati@gmail.com" readonly>
-                          </div>
-                          <div class="mb-3">
-                              <label for="toEmail" class="form-label">To:</label>
-                              <input type="email" name="ftoemail" class="form-control" id="toEmail" placeholder="Enter recipient email" value="<%= response.contact_email %>">
-                          </div>
-                          <div class="mb-3">
-                              <label for="ccEmail" class="form-label">CC:</label>
-                              <input type="text" name="fccemail" class="form-control" id="ccEmail" placeholder="Enter CC email">
-                          </div>
-                          <div class="mb-3">
-                              <label for="subject" class="form-label">Subject:</label>
-                              <input type="text" name="fsubject" class="form-control" id="subject" placeholder="Enter subject">
-                          </div>
-                          <div class="mb-3">
-                              <label for="editor" class="form-label">Message:</label>
-                              <div id="editor" style="height: 200px;"></div>
-                              <input type="hidden" name="ftextarea" id="hiddenMessage">
-                          </div>
-                          <div id="loading" style="display: none; text-align: center;">
-                            <img src="/loading.gif?v=1" alt="Loading...">
-                            <p>Sending Email...</p>
-                        </div>
-                          <div class="mb-3">
-                              <label for="fileAttachment" class="form-label">Attachment:</label>
-                              <input type="file" name="attachment" class="form-control" id="fileAttachment">
-                          </div>
-                          <button type="submit" class="btnsss btn-success">Send Email</button>
-                      </form>
-                    </div>
-                        </div>   
-                    </div>
-                </div>
+                       <!-- Email Section -->
+<div class="email-section" id="content">
+  <h4>Send an Email.</h4>
+  <form id="emailForm" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="fromEmail" class="form-label">From:</label>
+      <input type="email" name="ffremail" class="form-control" id="fromEmail" value="bhutobhawisyati@gmail.com" readonly>
+    </div>
+    <div class="mb-3">
+      <label for="toEmail" class="form-label">To:</label>
+      <input type="email" name="ftoemail" class="form-control" id="toEmail" placeholder="Enter recipient email" value="<%= response.contact_email %>">
+    </div>
+    <div class="mb-3">
+      <label for="ccEmail" class="form-label">CC:</label>
+      <input type="text" name="fccemail" class="form-control" id="ccEmail" placeholder="Enter CC email">
+    </div>
+    <div class="mb-3">
+      <label for="subject" class="form-label">Subject:</label>
+      <input type="text" name="fsubject" class="form-control" id="subject" placeholder="Enter subject">
+    </div>
+    <div class="mb-3">
+      <label for="editor" class="form-label">Message:</label>
+      <div id="editor" style="height: 200px;"></div>
+      <input type="hidden" name="ftextarea" id="hiddenMessage">
+    </div>
+    <div class="mb-3">
+      <label for="fileAttachment" class="form-label">Attachment:</label>
+      <input type="file" name="attachment" class="form-control" id="fileAttachment">
+    </div>
+    <button type="submit" class="btnsss btn-success">Send Email</button>
+  </form>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- Success Message -->
+<div id="success-message">✅ Email Sent Successfully!</div>
+
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         
         </div>
@@ -557,26 +601,15 @@
    
    
    </script>
+   <script>
  
- <script>
-  // Initialize Quill editor
-  var quill = new Quill('#editor', {
-    theme: 'snow',
-    readOnly: false,
-    placeholder: 'Enter message...',
-    modules: {
-      toolbar: [
-        [{ 'font': [] }, { 'size': [] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'align': [] }],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        ['clean']
-      ]
-    }
-  });
+ $(document).ready(function () {
+    // Initialize Quill Editor
+    var quill = new Quill('#editor', {
+        theme: 'snow'
+    });
 
-  $(document).on("click", ".btnsss", function (e) {
+    $(document).on("submit", "#emailForm", function (e) {
     e.preventDefault();
 
     // Get Quill content as HTML
@@ -584,61 +617,52 @@
     $("#hiddenMessage").val(messageHtml);
 
     Swal.fire({
-      title: "Are you sure?",
-      text: "This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Send",
-      cancelButtonText: "Cancel"
+        title: "Are you sure?",
+        text: "Do you want to send this email?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Send",
+        cancelButtonText: "Cancel"
     }).then((result) => {
-      if (result.isConfirmed) {
-        $("#loading").show(); // LOADER को दिखाओ
-        $(".btnsss").prop("disabled", true);
+        if (result.isConfirmed) {
+            // Show Loader (properly centered)
+            $("#loading-overlay").css({"visibility": "visible", "opacity": "1"});  
+            $(".btnsss").prop("disabled", true);
 
-        setTimeout(() => {
-          let formData = new FormData();
-          formData.append("ffremail", $("input[name='ffremail']").val());
-          formData.append("ftoemail", $("input[name='ftoemail']").val());
-          formData.append("fccemail", $("input[name='fccemail']").val());
-          formData.append("fsubject", $("input[name='fsubject']").val());
-          formData.append("ftextarea", quill.root.innerHTML);
+            let formData = new FormData($("#emailForm")[0]);
 
-          let fileInput = $("input[name='attachment']")[0].files[0];
-          if (fileInput) {
-            formData.append("attachment", fileInput);
-          }
-
-          $.ajax({
-            url: "/sendEmail",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function (data) {
-              setTimeout(() => { // LOADER हटाने से पहले थोड़ा रुकने का टाइम दो
-                $("#loading").hide();
-                $(".btnsss").prop("disabled", false);
-                Swal.fire({ icon: "success", text: "Email sent successfully!" });
-                setTimeout(() => location.reload(), 1000);
-              }, 500);
-            },
-            error: function () {
-              setTimeout(() => {
-                Swal.fire({ icon: "error", title: "Oops...", text: "Something went wrong." });
-                $("#loading").hide();
-                $(".btnsss").prop("disabled", false);
-              }, 500);
-            }
-          });
-        }, 100); 
-      }
+            $.ajax({
+                url: "/sendEmail",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    setTimeout(() => {
+                        $("#loading-overlay").css({"visibility": "hidden", "opacity": "0"}); // Hide loader
+                        $("#success-message").fadeIn().delay(3000).fadeOut(); // Show success message
+                        $(".btnsss").prop("disabled", false);
+                        Swal.fire("Sent!", "Your email was sent successfully.", "success");
+                    }, 500);
+                },
+                error: function (error) {
+                    setTimeout(() => {
+                        $("#loading-overlay").css({"visibility": "hidden", "opacity": "0"}); // Hide loader
+                        $(".btnsss").prop("disabled", false);
+                        Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                    }, 500);
+                }
+            });
+        }
     });
-  });
+});
+
+});
+
 </script>
-<script>
 
 
-</script>
+
 
 
 </html>
