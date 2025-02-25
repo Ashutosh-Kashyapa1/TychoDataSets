@@ -18,6 +18,7 @@ router.post('/',userController.userSignup);
 router.get('/login',auth.isLogout ,userController.getLoginForm);
 router.post('/login', userController.userLogin);
 router.get('/logout',auth.isLogin,userController.getLogout)
+// router.post('/sendEmail', uploads.array("attachments"), userController.sendEmail);
 router.post('/sendEmail',uploads.single("attachment") ,userController.sendEmail)
 router.get('/search',userController.getSearchByName)
 router.get('/table-view',auth.isLogin ,userController.getTableView) //endpoints for rendering table.
